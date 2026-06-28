@@ -69,14 +69,17 @@ jobs:
 
       # START: Check practical exercise
 
-      - name: Check PR title for keyphrase
+      - name: Check PR title for accepted keyphrase
         id: check-pr-title
         continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          keyphrase: "Add my first file"
-          text: ${{ github.event.pull_request.title }}
-          case-sensitive: false
+        run: |
+          if echo "$PR_TITLE" | grep -Eiq '^(Add my first file|Add PROFILE\.md|Create PROFILE\.md)$'; then
+            exit 0
+          fi
+          echo "Expected PR title to be one of: Add my first file, Add PROFILE.md, Create PROFILE.md"
+          exit 1
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
 
       - name: Check PR description is non-empty
         id: check-pr-description
